@@ -1,0 +1,13 @@
+# Data
+path: /content/drive/MyDrive/Stage_Critac/Dataset4/YoloData
+train: /content/drive/MyDrive/Stage_Critac/Dataset4/YoloData/images/train
+val: /content/drive/MyDrive/Stage_Critac/Dataset4/YoloData/images/valid
+nc: 1
+
+# Keypoints
+kpt_shape: [3, 3]  # [number of keypoints, number of dim]
+flip_idx: [0, 1, 2]
+
+# Classes
+names:
+  0: Club
