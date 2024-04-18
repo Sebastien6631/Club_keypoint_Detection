@@ -31,7 +31,7 @@ from references import coco_format
 from references.coco_format import change_name,fill_annotations_images, fill_json_annotations, split
 from references.augmentation import train_transform, ClassDataset
 from references.visual import visualize
-from references.model import get_model,inference
+from references.model import get_model,inference,inference_realtime
 
 import argparse
 import subprocess
@@ -51,6 +51,7 @@ def main():
     parser.add_argument('new_data_folder', type=str, default='', help='Chemin vers le fichier ou les données seront crée')
     parser.add_argument('--model', type=str, default=None, help='Chemin vers le model a tester ou pour l inference')
     parser.add_argument('--inference', type=str, default=None, help='Chemin vers le fichier ou la video a inferer provient')
+    parser.add_argument('--realtime', type=int, default=None, help='specifie qu une inference en temps reel doit etre fait')
 
     # Parser les arguments
     args = parser.parse_args()
@@ -61,9 +62,10 @@ def main():
     Coco_folder = args.new_data_folder
     if args.mode == 'test' :
         model_test = args.model
-    if args.mode == 'inference':
+    if args.mode == 'inference' :
         model_to_inference = args.model
         inference_file = args.inference
+        real_time = args.realtime
 
     # Afficher les valeurs des variables
     print(f'Tu as chosit le mode: {mode}')
@@ -354,18 +356,26 @@ def main():
         #model_to_test = os.path.join(output_dir,'model_19_baseline.pth')
         model = get_model(num_keypoints = 3, weights_path=model_to_inference)
 
-        #video_path = r"C:\Users\mcossin\Documents\object_detection\Data\youtube_video\test\video-youtube-2-test.mp4"
-        video_path = inference_file
+        if real_time == 1:
 
-        video_name = os.path.basename(video_path)
+            inference_realtime(model)
 
-        inference_name = 'inference_' + video_name
-        #output_file = os.path.join(r"C:\Users\mcossin\Documents\object_detection\code_detection\keypoint_detection\Inference",'video-youtube-2-inference.mp4')
-        output_file = os.path.join(project_path, 'Inference', inference_name)
+            print ("\nVideo inference en tenps reel")
 
-        inference(model,video_path,output_file,writer)
+        else :
 
-        print ("\nVideo inference enregisté dans ce chemin", output_file)
+            #video_path = r"C:\Users\mcossin\Documents\object_detection\Data\youtube_video\test\video-youtube-2-test.mp4"
+            video_path = inference_file
+
+            video_name = os.path.basename(video_path)
+
+            inference_name = 'inference_' + video_name
+            #output_file = os.path.join(r"C:\Users\mcossin\Documents\object_detection\code_detection\keypoint_detection\Inference",'video-youtube-2-inference.mp4')
+            output_file = os.path.join(project_path, 'Inference', inference_name)
+
+            inference(model,video_path,output_file,writer)
+
+            print ("\nVideo inference enregisté dans ce chemin", output_file)
 
     else: 
         print("Tu t'es trompé de mode ! \nLes modes possibles sont training, test et inference.")

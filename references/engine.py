@@ -116,11 +116,10 @@ def evaluate(model, data_loader, device):
         model_time = time.time() - model_time
 
         outputs = [{k: v.to(cpu_device) for k, v in t.items()} for t in outputs]
-        targets = [{k: torch.tensor(v) if isinstance(v, int) else v.to(cpu_device) for k, v in t.items()} for t in targets]
 
-        loss_dict = model.losses(outputs, targets)
-        loss = sum(loss for loss in loss_dict.values())
-        print(loss)
+        #loss_dict = model.losses(outputs, targets)
+        #loss = sum(loss for loss in loss_dict.values())
+        #print(loss)
 
         res = {}
         res = {target["image_id"]: output for target, output in zip(targets, outputs)}

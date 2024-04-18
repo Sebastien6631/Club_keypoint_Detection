@@ -134,3 +134,76 @@ def inference(model,video_path,output_file,writer):
         cap.release()
         out.release()
         cv2.destroyAllWindows()
+
+
+def inference_realtime(model):
+
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+    # Transférer le modèle sur l'appareil cible
+    model = model.to(device)
+
+    # Définir le modèle en mode d'évaluation
+    model.eval()
+
+    # Ouvrir la vidéo avec OpenCV
+    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(0)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 224)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 224)
+    cap.set(cv2.CAP_PROP_FPS, 36)
+
+    frame_count = 0
+    last_logged = time.time()
+
+    # Lire la vidéo image par image
+    while True:
+
+        # Lire une image de la vidéo
+        ret, frame = cap.read()
+
+        # Si la fin de la vidéo est atteinte, sortir de la boucle
+        if not ret:
+            break
+
+        # Convertir l'image en tenseur PyTorch
+        image = torch.from_numpy(frame).permute(2, 0, 1).float().unsqueeze(0) / 255
+        #image = (frame.permute(1,2,0).detach().cpu().numpy() * 255).astype(np.uint8)
+        image = image.to(device)
+
+        # Effectuer une prédiction avec le modèle
+        with torch.no_grad():
+            output = model(image)
+
+        # Extraire les prédictions de la sortie du modèle
+        scores = output[0]['scores'].detach().cpu().numpy()
+        high_scores_idxs = np.where(scores > 0.7)[0].tolist()
+        post_nms_idxs = torchvision.ops.nms(output[0]['boxes'][high_scores_idxs], output[0]['scores'][high_scores_idxs], 0.3).cpu().numpy()
+
+        keypoints = []
+        for kps in output[0]['keypoints'][high_scores_idxs][post_nms_idxs].detach().cpu().numpy():
+            keypoints.append([list(map(int, kp[:2])) for kp in kps])
+
+        bboxes = []
+        for bbox in output[0]['boxes'][high_scores_idxs][post_nms_idxs].detach().cpu().numpy():
+            bboxes.append(list(map(int, bbox.tolist())))
+
+        # Visualiser les prédictions sur l'image
+        frame = visualize(frame, bboxes, keypoints)
+
+        cv2.imshow('Frame', frame)
+
+        # Attendre 1 milliseconde pour permettre à l'utilisateur de fermer la fenêtre
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+        frame_count += 1
+        now = time.time()
+        if now - last_logged > 1:
+            print(f"{frame_count / (now-last_logged)} fps")
+            last_logged = now
+            frame_count = 0
+
+    # Libérer les ressources OpenCV
+    cap.release()
+    cv2.destroyAllWindows()

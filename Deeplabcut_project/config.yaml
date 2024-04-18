@@ -1,0 +1,77 @@
+    # Project definitions (do not edit)
+Task: keypoint_youtube
+scorer: sebastien
+date: Feb5
+multianimalproject: true
+identity:
+
+    # Project path (change when moving around)
+project_path: 
+  C:/Users/mcossin/Documents/object_detection/code_detection/keypoint_youtube-sebastien-2024-02-05
+
+    # Annotation data set configuration (and individual video cropping parameters)
+video_sets:
+  ? C:\Users\mcossin\Documents\object_detection\code_detection\keypoint_youtube-sebastien-2024-02-05\videos\video-youtube-1_train_eval.mp4
+  : crop: 0, 1280, 0, 720
+  ? C:\Users\mcossin\Documents\object_detection\code_detection\keypoint_youtube-sebastien-2024-02-05\videos\video-youtube-2-train-eval.mp4
+  : crop: 0, 1280, 0, 720
+  ? C:\Users\mcossin\Documents\object_detection\code_detection\keypoint_youtube-sebastien-2024-02-05\videos\video-youtube-3_train_eval.mp4
+  : crop: 0, 1280, 0, 720
+  ? C:\Users\mcossin\Documents\object_detection\code_detection\keypoint_youtube-sebastien-2024-02-05\videos\video-youtube-4_train_eval.mp4
+  : crop: 0, 1280, 0, 720
+individuals:
+- club1
+- club2
+- club3
+
+uniquebodyparts: []
+multianimalbodyparts:
+- clubhead
+- clubmiddle
+- clubhandle
+bodyparts: MULTI!
+
+    # Fraction of video to start/stop when extracting frames for labeling/refinement
+start: 0
+stop: 1
+numframes2pick: 150
+
+    # Plotting configuration
+skeleton:
+- - clubhead
+  - clubmiddle
+- - clubmiddle
+  - clubhandle
+- - clubhead
+  - clubhandle
+skeleton_color: red
+pcutoff: 0.7
+dotsize: 2
+alphavalue: 0.7
+colormap: rainbow
+
+    # Training,Evaluation and Analysis configuration
+TrainingFraction:
+- 0.7
+iteration: 25
+default_net_type: dlcrnet_ms5
+default_augmenter: multi-animal-imgaug
+default_track_method: ellipse
+snapshotindex: all
+batch_size: 10
+
+    # Cropping Parameters (for analysis and outlier frame detection)
+cropping: false
+    #if cropping is true for analysis, then set the values here:
+x1: 0
+x2: 640
+y1: 277
+y2: 624
+
+    # Refinement configuration (parameters from annotation dataset configuration also relevant in this stage)
+corner2move2:
+- 50
+- 50
+move2corner: true
+saveiters: 10000
+maxiters: 50000
