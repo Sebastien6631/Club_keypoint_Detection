@@ -10,12 +10,12 @@ import time
 from references.visual import visualize
 
 def get_model(num_keypoints, weights_path=None):
-    
+
     anchor_generator = AnchorGenerator(sizes=(32, 64, 128, 256, 512), aspect_ratios=(0.25, 0.5, 0.75, 1.0, 2.0, 3.0, 4.0)) # object with specified anchor sizes and aspect ratios.
-    
+
     model = torchvision.models.detection.keypointrcnn_resnet50_fpn(weights=None, # he detection head (the part responsible for object detection and keypoint prediction) will be initialized with random weights
                                                                    progress = True,
-                                                                   weights_backbone='ResNet50_Weights.IMAGENET1K_V1', #backbone network (ResNet-50) will be initialized with pre-trained weights from ImageNet
+                                                                   weights_backbone='ResNet50_Weights.DEFAULT', #backbone network (ResNet-50) will be initialized with pre-trained weights from ImageNet
                                                                    num_keypoints=num_keypoints,
                                                                    num_classes = 2, # Background is the first class, object is the second class
                                                                    trainable_backbone_layers = 5,
@@ -23,8 +23,8 @@ def get_model(num_keypoints, weights_path=None):
 
     if weights_path:
         state_dict = torch.load(weights_path)
-        model.load_state_dict(state_dict)        
-        
+        model.load_state_dict(state_dict)
+
     return model
 
 
@@ -148,9 +148,8 @@ def inference_realtime(model):
 
     # Ouvrir la vidéo avec OpenCV
     cap = cv2.VideoCapture(0)
-    cap = cv2.VideoCapture(0)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 224)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 224)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 500)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 500)
     cap.set(cv2.CAP_PROP_FPS, 36)
 
     frame_count = 0
